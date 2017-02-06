@@ -13,15 +13,11 @@
 
 void Setup_IO(void);
 void Setup_Interrupts(void);
-//void Setup_PWM(void);
 
-volatile bool Direction, Clear;//Command;
-volatile uint8_t Phase = 3;//, Pulse_Width;
-//volatile uint16_t Start_Time;
+volatile bool Direction, Clear;
 
 int main(void) {
   Setup_IO();
-//  Setup_PWM();
   Setup_Interrupts();
   for(;;) {}
   return 0;
@@ -47,11 +43,6 @@ void Setup_Interrupts() {
   sei(); //Global interrupt enable
 }
 
-// void Setup_PWM() {
-//   TCCR2A = (1 << COM2A1) | (1 << COM2B1) | (1 << WGM20); //OC2A and OC2B center alligned
-//   TCCR2B = (1 << CS21); //8 prescaler
-// }
-
 ISR(TIMER1_COMPA_vect) {
   //Choose phasing
   if(Direction) {
@@ -71,8 +62,10 @@ ISR(TIMER1_COMPA_vect) {
 }
 
 ISR(PCINT1_vect) {
+  //Generate PWM
   if((Prev >> 2) != (PINB >> 2)) //PCINT2 triggered the interrupt
     TIMSK1 ^= (1 << OCIE1A);
+  //Swap phasing
   else if((Prev >> 1) != (PINB >> 1)) //PCINT1 triggered the interrupt
     Direction = Direction ? false : true;
   Prev = PINB;
@@ -90,11 +83,3 @@ ISR(PCINT1_vect) {
 //       OCR2B = Pulse_Width/256;
 //   }
 // }
-
-//Selects rotation
-ISR(INT0_vect) {
-  Clear = true;
-  Direction = EICRA & (1 << ISC00) ? true : false;
-  EICRA ^= (1 << ISC00); //Toggle edge selection
-  //Command = Command ? false : true;
-}
