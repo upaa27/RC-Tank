@@ -74,7 +74,7 @@ ISR(PCINT1_vect) {
   if((Prev >> 2) != (PINB >> 2)) //PCINT2 triggered the interrupt
     TIMSK1 ^= (1 << OCIE1A);
   else if((Prev >> 1) != (PINB >> 1)) //PCINT1 triggered the interrupt
-    Direction ^= Direction;
+    Direction = Direction ? false : true;
   Prev = PINB;
 }
 
