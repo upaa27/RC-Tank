@@ -46,19 +46,18 @@ void Setup_Interrupts() {
 ISR(TIMER1_COMPA_vect) {
   //Choose phasing
   if(Direction) {
-    PORTD = (PORTD >> 1);
+    PORTD >>= 1;
     if(PORTD == 0)
       PORTD |= (1 << 7) | (1 << 6);
     if(PORTD & (1 << 2))
       PORTD |= (1 << 7);
   }
   else {
-    PORTD = (PORTD << 1);
-    if(PORTD == 0)
-      PORTD |= (1 << 2) | (1 << 3);
+    PORTD <<= 1;
     if(PORTD & (1 << 7))
       PORTD |= (1 << 2);
-  }
+    if(PORTD == 0 || PORTD == 0x04)
+      PORTD |= (1 << 2) | (1 << 3);
 }
 
 ISR(PCINT1_vect) {
